@@ -69,6 +69,38 @@ curl http://localhost:5003/health  # Order Service
 
 ### 2. Run Tests
 
+#### Option A: Using the Dev Container (Recommended)
+
+The dev container provides an isolated environment with all dependencies pre-installed and access to the microservices network via DNS:
+
+```bash
+# Build and start all services including dev container
+docker-compose up -d
+
+# Enter the dev container shell
+make dev-shell
+
+# Inside the dev container, you can run tests directly:
+make test-unit              # Run unit tests
+pytest tests/test_integration.py -v  # Run integration tests
+pytest tests/test_e2e.py -v         # Run end-to-end tests
+
+# Or run tests from outside the dev container:
+make dev-test-unit         # Run unit tests in dev container
+make dev-test-integration  # Run integration tests in dev container
+make dev-test-e2e          # Run end-to-end tests in dev container
+make dev-test-all          # Run all tests in dev container
+```
+
+**Benefits of the dev container:**
+- All dependencies pre-installed (Python, make, pytest, etc.)
+- Access to services via DNS (user-service:5000, product-service:5000, order-service:5000)
+- Same network environment as the microservices
+- No need to install Python or dependencies on your host machine
+- Consistent testing environment across different machines
+
+#### Option B: Running Tests on Host Machine
+
 ```bash
 # Run all unit tests (no services needed)
 make test-unit
@@ -378,11 +410,29 @@ python app.py
 
 ### Dev Container
 
-Open this project in VS Code with Dev Containers extension:
+The project includes a dev container that provides a complete testing environment:
 
+**Using Docker Compose (Recommended):**
+```bash
+# Start all services including dev container
+docker-compose up -d
+
+# Enter the dev container
+make dev-shell
+
+# You're now inside the dev container with:
+# - Python 3.11
+# - make
+# - All project dependencies
+# - Access to all microservices via DNS
+```
+
+**Using VS Code Dev Containers:**
 1. Open folder in VS Code
 2. Click "Reopen in Container"
 3. All services will start automatically
+
+Inside the dev container, you can run any test command and access services by their container names (user-service, product-service, order-service) instead of localhost.
 
 ## 📝 Test Data
 

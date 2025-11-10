@@ -1,10 +1,10 @@
-.PHONY: help build up down test test-unit test-integration test-e2e test-all logs clean
+.PHONY: help build up down test test-unit test-integration test-e2e test-all logs clean dev-shell dev-test-unit dev-test-integration dev-test-e2e dev-test-all
 
 help:
 	@echo "Microservices Testing Demo - Available Commands:"
 	@echo ""
-	@echo "  make build              - Build all Docker images"
-	@echo "  make up                 - Start all services"
+	@echo "  make build              - Build all Docker images (including dev container)"
+	@echo "  make up                 - Start all services (including dev container)"
 	@echo "  make down               - Stop all services"
 	@echo "  make test-unit          - Run unit tests (fast, no services needed)"
 	@echo "  make test-integration   - Run integration tests (requires services)"
@@ -12,6 +12,13 @@ help:
 	@echo "  make test-all           - Run all tests"
 	@echo "  make logs               - View logs from all services"
 	@echo "  make clean              - Stop services and remove volumes"
+	@echo ""
+	@echo "Dev Container Commands:"
+	@echo "  make dev-shell          - Enter the dev container shell"
+	@echo "  make dev-test-unit      - Run unit tests from dev container"
+	@echo "  make dev-test-integration - Run integration tests from dev container"
+	@echo "  make dev-test-e2e       - Run end-to-end tests from dev container"
+	@echo "  make dev-test-all       - Run all tests from dev container"
 	@echo ""
 
 build:
@@ -77,3 +84,40 @@ logs:
 clean:
 	docker-compose down -v
 	@echo "Cleaned up services and volumes"
+
+# Dev Container Commands
+dev-shell:
+	@echo "Entering dev container shell..."
+	@echo "You can now run tests with 'make test-unit', 'make test-integration', etc."
+	@echo "Services are available at:"
+	@echo "  - user-service:5000"
+	@echo "  - product-service:5000"
+	@echo "  - order-service:5000"
+	@echo ""
+	docker-compose exec dev-container /bin/bash
+
+dev-test-unit:
+	@echo "Running unit tests from dev container..."
+	docker-compose exec dev-container make test-unit
+
+dev-test-integration:
+	@echo "Running integration tests from dev container..."
+	docker-compose exec dev-container python -m pytest tests/test_integration.py -v
+
+dev-test-e2e:
+	@echo "Running end-to-end tests from dev container..."
+	docker-compose exec dev-container python -m pytest tests/test_e2e.py -v
+
+dev-test-all:
+	@echo "Running all tests from dev container..."
+	@echo ""
+	@echo "=== Unit Tests ==="
+	docker-compose exec dev-container make test-unit
+	@echo ""
+	@echo "=== Integration Tests ==="
+	docker-compose exec dev-container python -m pytest tests/test_integration.py -v
+	@echo ""
+	@echo "=== End-to-End Tests ==="
+	docker-compose exec dev-container python -m pytest tests/test_e2e.py -v
+	@echo ""
+	@echo "All tests completed!"
