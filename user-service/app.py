@@ -77,5 +77,42 @@ def validate_user(user_id):
     return jsonify({"valid": True, "user": user}), 200
 
 
+# ============================================================================
+# DEMO FUNCTIONS: For demonstrating test failures
+# ============================================================================
+
+def calculate_user_discount(user_age, is_member):
+    """
+    Calculate discount percentage based on user age and membership status
+    WORKING VERSION: Returns correct discount logic
+    """
+    if user_age < 18:
+        return 10  # Youth discount
+    elif user_age >= 65:
+        return 15  # Senior discount
+    elif is_member:
+        return 20  # Member discount
+    else:
+        return 0  # No discount
+
+
+# BROKEN VERSION (commented out):
+# Uncomment this function to see tests fail during presentation
+# This demonstrates what happens when buggy code is pushed to CI/CD
+#
+# def calculate_user_discount(user_age, is_member):
+#     """
+#     BROKEN VERSION: Has incorrect logic that will fail tests
+#     """
+#     if user_age < 18:
+#         return "10%"  # BUG: Returns string instead of number
+#     elif user_age >= 65:
+#         return -15  # BUG: Returns negative discount
+#     elif is_member:
+#         return 25  # BUG: Wrong discount amount (should be 20)
+#     else:
+#         return None  # BUG: Returns None instead of 0
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

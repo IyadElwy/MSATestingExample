@@ -120,5 +120,46 @@ def calculate_product_total(quantity, unit_price):
     return quantity * unit_price
 
 
+# ============================================================================
+# DEMO FUNCTIONS: For demonstrating test failures
+# ============================================================================
+
+def apply_bulk_discount(quantity, unit_price):
+    """
+    Apply bulk discount based on quantity
+    WORKING VERSION: Returns correct discounted price
+    """
+    total = quantity * unit_price
+
+    if quantity >= 100:
+        return total * 0.80  # 20% discount for 100+ items
+    elif quantity >= 50:
+        return total * 0.90  # 10% discount for 50-99 items
+    elif quantity >= 10:
+        return total * 0.95  # 5% discount for 10-49 items
+    else:
+        return total  # No discount
+
+
+# BROKEN VERSION (commented out):
+# Uncomment this function to see tests fail during presentation
+# This demonstrates what happens when buggy code is pushed to CI/CD
+#
+# def apply_bulk_discount(quantity, unit_price):
+#     """
+#     BROKEN VERSION: Has incorrect logic that will fail tests
+#     """
+#     total = quantity * unit_price
+#
+#     if quantity >= 100:
+#         return total * 1.20  # BUG: Increases price instead of discount
+#     elif quantity >= 50:
+#         return total * 0.80  # BUG: Wrong discount (should be 0.90)
+#     elif quantity >= 10:
+#         return 0  # BUG: Returns 0 instead of discounted price
+#     else:
+#         return -total  # BUG: Returns negative price
+
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)

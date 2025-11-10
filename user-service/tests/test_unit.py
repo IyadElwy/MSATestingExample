@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app, users_db
+from app import app, users_db, calculate_user_discount
 
 
 @pytest.fixture
@@ -167,3 +167,36 @@ class TestValidateUser:
         data = response.get_json()
         assert data['valid'] is False
         assert data['reason'] == 'User not found'
+
+
+class TestUserDiscountCalculation:
+    """Test user discount calculation logic (DEMO FUNCTION)"""
+
+    def test_youth_discount(self):
+        """Youth under 18 should get 10% discount"""
+        discount = calculate_user_discount(user_age=16, is_member=False)
+        assert discount == 10
+        assert isinstance(discount, int)
+
+    def test_senior_discount(self):
+        """Seniors 65+ should get 15% discount"""
+        discount = calculate_user_discount(user_age=70, is_member=False)
+        assert discount == 15
+        assert isinstance(discount, int)
+
+    def test_member_discount(self):
+        """Members should get 20% discount"""
+        discount = calculate_user_discount(user_age=30, is_member=True)
+        assert discount == 20
+        assert isinstance(discount, int)
+
+    def test_no_discount(self):
+        """Regular users should get 0% discount"""
+        discount = calculate_user_discount(user_age=30, is_member=False)
+        assert discount == 0
+        assert isinstance(discount, int)
+
+    def test_senior_member_priority(self):
+        """Senior should get senior discount (not member discount)"""
+        discount = calculate_user_discount(user_age=70, is_member=True)
+        assert discount == 15  # Senior discount takes priority

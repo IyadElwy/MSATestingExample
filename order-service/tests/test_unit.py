@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app, orders_db, calculate_order_total
+from app import app, orders_db, calculate_order_total, calculate_shipping_cost
 from unittest.mock import patch, MagicMock
 
 
@@ -211,3 +211,43 @@ class TestCreateOrderWithMocks:
         invalid_data = {'user_id': 1}  # Missing product_id and quantity
         response = client.post('/api/orders', json=invalid_data)
         assert response.status_code == 400
+
+
+class TestShippingCostCalculation:
+    """Test shipping cost calculation logic (DEMO FUNCTION)"""
+
+    def test_free_shipping_for_orders_over_100(self):
+        """Orders over $100 should have free shipping"""
+        shipping = calculate_shipping_cost(order_total=150.00, delivery_speed="standard")
+        assert shipping == 0.0
+        assert isinstance(shipping, float)
+
+    def test_express_shipping_cost(self):
+        """Express shipping should cost $15.99"""
+        shipping = calculate_shipping_cost(order_total=50.00, delivery_speed="express")
+        assert shipping == 15.99
+        assert isinstance(shipping, float)
+
+    def test_standard_shipping_cost(self):
+        """Standard shipping should cost $5.99"""
+        shipping = calculate_shipping_cost(order_total=50.00, delivery_speed="standard")
+        assert shipping == 5.99
+        assert isinstance(shipping, float)
+
+    def test_economy_shipping_cost(self):
+        """Economy shipping should cost $2.99"""
+        shipping = calculate_shipping_cost(order_total=50.00, delivery_speed="economy")
+        assert shipping == 2.99
+        assert isinstance(shipping, float)
+
+    def test_default_shipping_cost(self):
+        """Unknown delivery speed should default to standard ($5.99)"""
+        shipping = calculate_shipping_cost(order_total=50.00, delivery_speed="unknown")
+        assert shipping == 5.99
+
+    def test_shipping_cost_is_positive(self):
+        """Shipping cost should always be non-negative"""
+        for speed in ["express", "standard", "economy"]:
+            shipping = calculate_shipping_cost(order_total=50.00, delivery_speed=speed)
+            assert shipping >= 0
+            assert isinstance(shipping, float)

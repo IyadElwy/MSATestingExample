@@ -7,7 +7,7 @@ import sys
 import os
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-from app import app, products_db, calculate_product_total
+from app import app, products_db, calculate_product_total, apply_bulk_discount
 
 
 @pytest.fixture
@@ -165,3 +165,34 @@ class TestReserveProduct:
         """Reserving non-existent product should return 404"""
         response = client.put('/api/products/999/reserve', json={'quantity': 1})
         assert response.status_code == 404
+
+
+class TestBulkDiscountCalculation:
+    """Test bulk discount calculation logic (DEMO FUNCTION)"""
+
+    def test_no_discount_for_small_quantity(self):
+        """Orders under 10 items should get no discount"""
+        discounted_price = apply_bulk_discount(quantity=5, unit_price=10.0)
+        assert discounted_price == 50.0
+
+    def test_5_percent_discount_for_10_items(self):
+        """Orders of 10-49 items should get 5% discount"""
+        discounted_price = apply_bulk_discount(quantity=10, unit_price=10.0)
+        assert discounted_price == 95.0  # 100 * 0.95
+
+    def test_10_percent_discount_for_50_items(self):
+        """Orders of 50-99 items should get 10% discount"""
+        discounted_price = apply_bulk_discount(quantity=50, unit_price=10.0)
+        assert discounted_price == 450.0  # 500 * 0.90
+
+    def test_20_percent_discount_for_100_items(self):
+        """Orders of 100+ items should get 20% discount"""
+        discounted_price = apply_bulk_discount(quantity=100, unit_price=10.0)
+        assert discounted_price == 800.0  # 1000 * 0.80
+
+    def test_discount_returns_positive_number(self):
+        """Discounted price should always be positive"""
+        for quantity in [1, 10, 50, 100]:
+            price = apply_bulk_discount(quantity=quantity, unit_price=10.0)
+            assert price > 0
+            assert isinstance(price, (int, float))

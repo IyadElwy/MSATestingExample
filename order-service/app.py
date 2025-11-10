@@ -115,6 +115,50 @@ def calculate_order_total(quantity, unit_price):
     return quantity * unit_price
 
 
+# ============================================================================
+# DEMO FUNCTIONS: For demonstrating test failures
+# ============================================================================
+
+def calculate_shipping_cost(order_total, delivery_speed):
+    """
+    Calculate shipping cost based on order total and delivery speed
+    WORKING VERSION: Returns correct shipping cost
+    """
+    if order_total >= 100:
+        # Free shipping for orders over $100
+        return 0.0
+
+    if delivery_speed == "express":
+        return 15.99
+    elif delivery_speed == "standard":
+        return 5.99
+    elif delivery_speed == "economy":
+        return 2.99
+    else:
+        return 5.99  # Default to standard
+
+
+# BROKEN VERSION (commented out):
+# Uncomment this function to see tests fail during presentation
+# This demonstrates what happens when buggy code is pushed to CI/CD
+#
+# def calculate_shipping_cost(order_total, delivery_speed):
+#     """
+#     BROKEN VERSION: Has incorrect logic that will fail tests
+#     """
+#     if order_total >= 100:
+#         return 10.0  # BUG: Charges for free shipping
+#
+#     if delivery_speed == "express":
+#         return "15.99"  # BUG: Returns string instead of number
+#     elif delivery_speed == "standard":
+#         return -5.99  # BUG: Returns negative cost
+#     elif delivery_speed == "economy":
+#         return 25.99  # BUG: Economy more expensive than express
+#     else:
+#         return None  # BUG: Returns None instead of default value
+
+
 @app.route('/api/orders', methods=['POST'])
 def create_order():
     """Create a new order
