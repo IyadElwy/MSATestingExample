@@ -60,6 +60,27 @@ services:
       timeout: 5s
       retries: 3
 
+  dev-container:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: dev-container
+    volumes:
+      - .:/workspace
+    environment:
+      - USER_SERVICE_URL=http://user-service:5000
+      - PRODUCT_SERVICE_URL=http://product-service:5000
+      - ORDER_SERVICE_URL=http://order-service:5000
+    depends_on:
+      - user-service
+      - product-service
+      - order-service
+    networks:
+      - microservices-network
+    stdin_open: true
+    tty: true
+    command: sleep infinity
+
 networks:
   microservices-network:
     driver: bridge
