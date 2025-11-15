@@ -35,8 +35,8 @@ def health_check():
 def get_all_users():
     """Get all users"""
     logger.info("Fetching all users")
-    # return
-    return jsonify({"users": list(users_db.values())}), 200
+    return
+    # return jsonify({"users": list(users_db.values())}), 200
 
 
 @app.route("/api/users/<int:user_id>", methods=["GET"])
